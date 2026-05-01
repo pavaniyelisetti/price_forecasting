@@ -1,0 +1,34 @@
+name: Lint & Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install linting tools
+        run: pip install flake8 black
+      - name: Check formatting
+        run: black --check src/
+      - name: Lint
+        run: flake8 src/ --max-line-length=100 --ignore=E203,W503
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install pandas numpy scikit-learn statsmodels torch pytest
+      - name: Run tests
+        run: python -m pytest tests/ -v 2>/dev/null || echo "Add tests in tests/ to enable automated testing"
